@@ -3,12 +3,16 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:xrpay/features/authentication/domain/usecases/signup.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
 
 class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
-  AuthenticationBloc() : super(const AuthenticationState()) {
+
+  final SignUpUseCase _signUpUseCase;
+
+  AuthenticationBloc(this._signUpUseCase) : super(const AuthenticationState()) {
     on<UpdateNameEvent>(updateName);
     on<UpdateEmailEvent>(updateEmail);
     on<UpdatePasswordEvent>(updatePassword);
@@ -69,7 +73,12 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     return true;
   }
 
-  void userSignUp(SignUpEvent event,Emitter<AuthenticationState> emit) {
-
+  void userSignUp(SignUpEvent event,Emitter<AuthenticationState> emit) async {
+    try {
+      SignUpParams signUpParams = SignUpParams(name: state.name, email: state.email, password: state.password);
+      await _signUpUseCase(signUpParams);
+    } catch(error) {
+      log("***auth_bloc: $error");
+    }
   }
 }
