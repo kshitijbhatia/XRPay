@@ -24,3 +24,7 @@ class UpdatePasswordEvent extends AuthenticationEvent {
 class HideShowPasswordEvent extends AuthenticationEvent{}
 
 class SignUpEvent extends AuthenticationEvent {}
+
+class LoginEvent extends AuthenticationEvent {}
+
+class ResetAuthStateEvent extends AuthenticationEvent {}

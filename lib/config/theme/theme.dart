@@ -15,6 +15,9 @@ ThemeData themeData() {
       /// For labels on text fields etc.
       labelLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16.sp),
 
+      labelMedium: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 16.sp),
+
+      headlineLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 48.sp)
     )
   );
 }

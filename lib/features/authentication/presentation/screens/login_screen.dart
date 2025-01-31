@@ -8,16 +8,15 @@ import 'package:xrpay/features/authentication/presentation/bloc/authentication_b
 import 'package:xrpay/features/authentication/presentation/widgets/textfield.dart';
 import 'package:xrpay/injection_container.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _LoginScreenState extends State<LoginScreen> {
 
-  late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
 
@@ -25,11 +24,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -56,9 +54,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: [
                 _backButton(),
                 10.ph,
-                Text("Sign Up", style: Theme.of(context).textTheme.titleLarge,),
+                Text("Log In", style: Theme.of(context).textTheme.titleLarge,),
                 5.ph,
-                Text("Sign Up to access your account and transfer money", style: Theme.of(context).textTheme.titleSmall,),
+                Text("Log In to access your account and transfer money", style: Theme.of(context).textTheme.titleSmall,),
                 20.ph,
                 _formView()
               ],
@@ -92,18 +90,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Name", style: Theme.of(context).textTheme.labelLarge,),
-        5.ph,
-        CustomTextField(
-          controller: _nameController,
-          errorMessage: "Please enter your name",
-          hintText: "Name",
-          prefixIcon: Icons.person,
-          onChanged: (value) {
-            context.read<AuthenticationBloc>().add(UpdateNameEvent(_nameController.text));
-          },
-        ),
-        10.ph,
         Text("Email", style: Theme.of(context).textTheme.labelLarge,),
         5.ph,
         CustomTextField(
@@ -145,9 +131,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               onTap: state.isFormValid ? () {
                 final String email = _emailController.text;
                 final String password = _passwordController.text;
-                final String name = _nameController.text;
-                log("Details: $name $email $password");
-                context.read<AuthenticationBloc>().add(SignUpEvent());
+                log("Details: $email $password");
+                context.read<AuthenticationBloc>().add(LoginEvent());
               } : (){},
               child: Container(
                 width: double.infinity,

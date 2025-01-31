@@ -3,7 +3,9 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:xrpay/core/network/network_error.dart';
 import 'package:xrpay/features/authentication/domain/usecases/signup.dart';
+import 'package:xrpay/features/authentication/domain/usecases/login.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -11,33 +13,36 @@ part 'authentication_state.dart';
 class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
 
   final SignUpUseCase _signUpUseCase;
+  final LoginUseCase _loginUseCase;
 
-  AuthenticationBloc(this._signUpUseCase) : super(const AuthenticationState()) {
+  AuthenticationBloc(this._signUpUseCase, this._loginUseCase) : super(const AuthenticationState()) {
     on<UpdateNameEvent>(updateName);
     on<UpdateEmailEvent>(updateEmail);
     on<UpdatePasswordEvent>(updatePassword);
     on<HideShowPasswordEvent>(updateObscureText);
     on<SignUpEvent>(userSignUp);
+    on<ResetAuthStateEvent>(resetAuthState);
+    on<LoginEvent>(userLogin);
   }
 
   updateName(UpdateNameEvent event, Emitter<AuthenticationState> emit) {
     emit(state.copyWith(
       name: event.name,
-      isFormValid: _isFormValid(event.name, state.password, state.email)
+      isFormValid: _isFormValid(name: event.name, state.password, state.email)
     ));
   }
 
   updateEmail(UpdateEmailEvent event, Emitter<AuthenticationState> emit) {
     emit(state.copyWith(
       email: event.email,
-      isFormValid: _isFormValid(state.name, state.password, event.email),
+      isFormValid: _isFormValid(name: state.name, state.password, event.email),
     ));
   }
 
   updatePassword(UpdatePasswordEvent event, Emitter<AuthenticationState> emit) {
     emit(state.copyWith(
       password: event.password,
-      isFormValid: _isFormValid(state.name, event.password, state.email)
+      isFormValid: _isFormValid(name: state.name, event.password, state.email)
     ));
   }
 
@@ -66,19 +71,40 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     return false;
   }
 
-  bool _isFormValid(String name, String password, String email) {
-    if(!_isValidEmail(email) || !_isValidName(name) || !_isValidPassword(password)) {
-      return false;
-    }
-    return true;
+  bool _isFormValid(String password, String email, {String name = ""}) {
+    final bool validEmail = _isValidEmail(email);
+    final bool validPassword = _isValidPassword(password);
+    bool validName = true;
+    if(name != "") validName = _isValidName(name);
+
+    return validName && validPassword && validEmail;
   }
 
   void userSignUp(SignUpEvent event,Emitter<AuthenticationState> emit) async {
     try {
+      emit(state.copyWith(status: AuthenticationStatus.loading, error: null));
       SignUpParams signUpParams = SignUpParams(name: state.name, email: state.email, password: state.password);
       await _signUpUseCase(signUpParams);
-    } catch(error) {
-      log("***auth_bloc: $error");
+      emit(state.copyWith(status: AuthenticationStatus.success, error: null));
+    } on DataException catch(error) {
+      log("***auth_signup_bloc: ${error.message}");
+      emit(state.copyWith(status: AuthenticationStatus.error, error: error.message));
     }
+  }
+
+  void userLogin(LoginEvent event, Emitter<AuthenticationState> emit) async {
+    try {
+      emit(state.copyWith(status: AuthenticationStatus.loading, error: null));
+      LoginParams loginParams = LoginParams(email: state.email, password: state.password);
+      await _loginUseCase(loginParams);
+      emit(state.copyWith(status: AuthenticationStatus.success, error: null));
+    } on DataException catch(error) {
+      log("***auth_login_bloc: ${error.message}");
+      emit(state.copyWith(status: AuthenticationStatus.error, error: error.message));
+    }
+  }
+
+  resetAuthState(ResetAuthStateEvent event, Emitter<AuthenticationState> emit) {
+    emit(const AuthenticationState());
   }
 }

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:xrpay/config/theme/theme.dart';
+import 'package:xrpay/core/routes/routes.dart';
 import 'package:xrpay/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:xrpay/features/authentication/presentation/screens/get_started_screen.dart';
 import 'package:xrpay/features/authentication/presentation/screens/signup_screen.dart';
 import 'package:xrpay/firebase_options.dart';
 import 'package:xrpay/injection_container.dart';
@@ -33,8 +35,10 @@ class MyApp extends StatelessWidget {
           child: MaterialApp(
             title: 'Flutter Demo',
             debugShowCheckedModeBanner: false,
+            onGenerateRoute: NavigationService.generateRoutes,
+            navigatorKey: NavigationService.navigationKey,
             theme: themeData(),
-            home: SignUpScreen(),
+            home: const GetStartedScreen(),
           ),
         );
       },
