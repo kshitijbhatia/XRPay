@@ -5,11 +5,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:xrpay/config/theme/theme.dart';
 import 'package:xrpay/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:xrpay/features/authentication/presentation/screens/signup_screen.dart';
+import 'package:xrpay/firebase_options.dart';
 import 'package:xrpay/injection_container.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform
+  );
   await initDependencies();
   runApp(const MyApp());
 }
